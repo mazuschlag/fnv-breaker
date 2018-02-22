@@ -1,1 +1,4 @@
 Hello world!
+This is Ernest Hemingway with an important message.
+Fuck Windows.
+That is all.
