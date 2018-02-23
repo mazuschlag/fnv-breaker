@@ -21,7 +21,7 @@ javaPath = javaPathArr.join('');
 const app = express();
 const router = express.Router();
 
-// Set up our port to either a predetermined port number or 3001
+// Set up port to either a predetermined port number or 3001
 const port = process.env.API_PORT || 3001;
 
 
@@ -39,8 +39,7 @@ const storage = multer.diskStorage({
 // Create multer instance that will be used to upload/save file
 const upload = multer({ storage });
 
-
-// Now configure the API to use bodyParser and look for JSON data in request body
+// Configure the API to use bodyParser and look for JSON data in request body
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
@@ -54,30 +53,44 @@ app.use((req, res, next) => {
 	next();
 });
 
-router.route('/uploads/:filename')
-	.get((req, res) => {
+// Send the decoded password file
+app.get('/api/results/results.txt', (req, res) => {
+		let results = '../fnv-breaker/results/results.txt';
+		let resultsPath = path.resolve(results);
+		res.sendFile(resultsPath);
+	});
+// Starts Java process to process passwords
+app.get('/api/uploads/:filename', (req, res) => {
 		let uploads = '../fnv-breaker/uploads/';
-		let passwords = '../fnv-breaker/passwords/testkeys.txt';
-		let filePath = path.resolve(uploads.concat(req.params.filename));
-		let passwordPath = path.resolve(passwords);
-		let javaChild = childProcessor.spawn('java', ['-jar', javaPath, filePath, passwordPath]);
+		let passwords = '../fnv-breaker/passwords/rockyou75.txt';
+		let results = '../fnv-breaker/results/results.txt'
+		let filePath = path.resolve(uploads.concat(req.params.filename)); // Create file path for the user's file
+		let passwordPath = path.resolve(passwords); // Create file path for the common password file
+		let resultsPath = path.resolve(results); // Create file path for results
+		let javaChild = childProcessor.spawn('java', ['-jar', javaPath, filePath, passwordPath, resultsPath]); // Spawn child Java process to do heavy lifting
+		javaChild.stdin.on('data', function(data) {
+			console.log('stdin: ' + data);
+		})
 		javaChild.stdout.on('data', function(data) {
 			let reply = data.toString();
-			res.json({ message: reply });
+			console.log(data);
+			res.send(reply);
+			return;
 		});
 		javaChild.stderr.on('data', function(data) {
 			let reply = data.toString();
 			console.log(reply);
-			res.json({ message: reply });
 		});
+		javaChild.on('close', function(code) {
+			console.log('closing code: ' + code);
+		})
 	});
 
-router.route('/uploads')
-	.post(upload.single('selectedFile'), (req, res) => {
+// Route for handling user uploaded file
+app.post('/api/uploads', upload.single('selectedFile'), (req, res) => {
 		res.json({ message: req.file.filename });
 	});
 
-app.use('/api', router);
 
 app.listen(port, function() {
 	console.log(`api is running on port ${port}`);
