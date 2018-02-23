@@ -61,6 +61,7 @@ app.get('/api/results/results.txt', (req, res) => {
 	});
 // Starts Java process to process passwords
 app.get('/api/uploads/:filename', (req, res) => {
+		req.setTimeout(0); // prevent timeouts
 		let uploads = '../fnv-breaker/uploads/';
 		let passwords = '../fnv-breaker/passwords/rockyou75.txt';
 		let results = '../fnv-breaker/results/results.txt'
@@ -70,12 +71,10 @@ app.get('/api/uploads/:filename', (req, res) => {
 		let javaChild = childProcessor.spawn('java', ['-jar', javaPath, filePath, passwordPath, resultsPath]); // Spawn child Java process to do heavy lifting
 		javaChild.stdin.on('data', function(data) {
 			console.log('stdin: ' + data);
-		})
+		});
 		javaChild.stdout.on('data', function(data) {
 			let reply = data.toString();
-			console.log(data);
-			res.send(reply);
-			return;
+			console.log(reply);
 		});
 		javaChild.stderr.on('data', function(data) {
 			let reply = data.toString();
@@ -83,7 +82,9 @@ app.get('/api/uploads/:filename', (req, res) => {
 		});
 		javaChild.on('close', function(code) {
 			console.log('closing code: ' + code);
-		})
+			res.send({ closingCode: code }); // Java is finished, tell the client
+		});
+		console.log('Waiting for child process (Breaker.jar) to complete...');
 	});
 
 // Route for handling user uploaded file
