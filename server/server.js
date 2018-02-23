@@ -56,9 +56,11 @@ app.use((req, res, next) => {
 
 router.route('/uploads/:filename')
 	.get((req, res) => {
-		let directory = '../fnv-breaker/uploads/';
-		let filePath = path.resolve(directory.concat(req.params.filename));
-		let javaChild = childProcessor.spawn('java', ['-jar', javaPath, filePath]);
+		let uploads = '../fnv-breaker/uploads/';
+		let passwords = '../fnv-breaker/passwords/testkeys.txt';
+		let filePath = path.resolve(uploads.concat(req.params.filename));
+		let passwordPath = path.resolve(passwords);
+		let javaChild = childProcessor.spawn('java', ['-jar', javaPath, filePath, passwordPath]);
 		javaChild.stdout.on('data', function(data) {
 			let reply = data.toString();
 			res.json({ message: reply });
