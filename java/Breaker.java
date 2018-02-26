@@ -72,7 +72,7 @@ public class Breaker {
 			if (finished) return;
 
 			waitForOthers(NULL_FLAG, I_FLAG);
-
+			
 			while (i < ALPHABET.length) {
 				while (j < ALPHABET.length) {
 					checkFromIterationTwo();
@@ -209,7 +209,6 @@ public class Breaker {
 					waitForOthers(J_FLAG, K_FLAG, L_FLAG, M_FLAG, N_FLAG, O_FLAG);
 				}
 				if (finished) return;
-				System.out.println(Thread.currentThread().getName() + " i: " + i);
 				waitForOthers(I_FLAG, J_FLAG, K_FLAG, L_FLAG, M_FLAG, N_FLAG, O_FLAG);
 			}
 
@@ -276,7 +275,7 @@ public class Breaker {
 		}
 
 		// Pop the next password from the most common password queue
-		private String popFromQueue() {
+		private synchronized String popFromQueue() {
 			if (!keys.isEmpty()) {
 				return keys.remove();	
 			}
@@ -284,7 +283,7 @@ public class Breaker {
 		}
 
 		// Creates a string based on the current iteration
-		private String getStringFromIncrement(int flag, int... indexes) {
+		private synchronized String getStringFromIncrement(int flag, int... indexes) {
 			// Double check that the current iteration is in bounds
 			// If not, return empty string (which will propagate down the next function calls)
 			for (int index : indexes) {
@@ -302,7 +301,7 @@ public class Breaker {
 
 		// Calculate the hash of the plaintext password guess.
 		// If there was no guess (empty buffer/index out of range), return empty string.
-		private String fnv(String byteString) {
+		private synchronized String fnv(String byteString) {
 			if (byteString != "") {
 				byte[] bytes = byteString.getBytes();
 				BigInteger hash = Breaker.FNV_OFFSET;
@@ -318,8 +317,8 @@ public class Breaker {
 
 		// Check if the result of the password hash matches any of the keys in the hashmap
 		// If so, add it to the hashman as that key's value
-		private void checkResult(String current, String result) {
-			if (keyHashes.get(result) != null) {
+		private synchronized void checkResult(String current, String result) {
+			if (keyHashes.get(result) != null && keyHashes.get(result) == "") {
 				keyHashes.put(result, current);
 				foundPasswords++;
 				if (foundPasswords == TOTAL_PASSWORDS) {
@@ -491,7 +490,7 @@ public class Breaker {
 	public void runThreads() {
 		// Create object that the threads will share
 		BreakerThread breakerThread = new BreakerThread(keyBuffer, hashTable, CORES, resultsFile);
-		
+
 		// Number of threads is based on the number of CPUs (CORES)
 		Thread[] threadList = new Thread[CORES];
 		for (int i = 0; i < threadList.length; i++) {
