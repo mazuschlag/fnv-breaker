@@ -3,7 +3,7 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import fileDownload from 'react-file-download';
-import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import 'bootstrap.min.css';
 import './App.css';
 
 class App extends Component {
