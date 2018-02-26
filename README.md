@@ -1,4 +1,4 @@
-#FNV Breaker
+# FNV Breaker
 Build with `$npm install`, run with `$npm start`
 
 This project was bootstrapped with create-react-app.
