@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import axios from 'axios';
-import FileDownload from 'react-file-download';
+import FileDownload from '../node_modules/react-file-download';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
