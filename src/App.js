@@ -2,7 +2,7 @@
 
 import React, { Component } from 'react';
 import axios from 'axios';
-import FileDownload from '../node_modules/react-file-download';
+import fileDownload from 'react-file-download';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './App.css';
 
@@ -57,7 +57,7 @@ class App extends Component {
     console.log(fileURL);
     axios.get(fileURL)
       .then(res => {
-        FileDownload(res.data, 'results.txt');
+        fileDownload(res.data, 'results.txt');
       });
   }
 
