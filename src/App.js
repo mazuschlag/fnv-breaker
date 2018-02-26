@@ -3,8 +3,8 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import fileDownload from 'react-file-download';
-import 'bootstrap.min.css';
-import './App.css';
+import './style/bootstrap.min.css';
+import './style/App.css';
 
 class App extends Component {
   constructor(props) {
