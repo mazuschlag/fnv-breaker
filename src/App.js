@@ -100,7 +100,7 @@ class App extends Component {
             <div className="form-group">
               <input className="form-control" type="file" name="selectedFile" onChange={ this.handleChange }/>
             </div>
-            <button type="submit" class="btn btn-default">Submit</button>
+            <button type="submit" className="btn btn-default">Submit</button>
           </form>
           { this.state.before && <div className="start-button"><button type="button" className="btn btn-primary btn-lg" id="go-button" onClick={ this.handleStart }>Start</button></div> }
         </div>
